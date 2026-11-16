@@ -1,11 +1,16 @@
 <%-  include("./partials/header.ejs") %>
     
     <h1> Web </h1>
-    <form action="/review" method="get">
-        <button id="done" class="edit" type="submit" >REVIEW</button>
-    </form>
+<form action="/review" method="post">
+<label class="form-control form-adorn">
+  <div class="form-adorn-icon" aria-hidden="true">
+    <svg class="bi" width="16" height="16"><use href="#search" /></svg>
+  </div>
+  <input type="search" name="videogameSearched" class="form-ghost" placeholder="Search...">
+</label>
+</form>
 
-
+<p class="videogameError">Videogame doesnt exist</p>
 
 
 

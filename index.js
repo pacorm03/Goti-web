@@ -34,51 +34,19 @@ app.get("/review", (req, res) => {
     console.log("Error: " + err);
   }
 });
-/*
-function searchVideogame(name){
-let rawQueryString = `fields name, artworks ;search "${name}" ;where version_parent = null;`;
-    const response = await axios.post(
-      API_URL + "games",
-      rawQueryString,
-      config,
-    );
-    console.log(response.data[0].name);
-    console.log(response.data[0].artworks);
-    return [response.data[0].name, response.data[0].artworks]
-}
-*/
+
 app.post("/review", async (req, res) => {
   const name = req.body.videogameSearched;
   console.log(name);
+  
   try {
-    let rawQueryString = `fields name, artworks ;search "${name}" ;where version_parent = null;`;
-    const response = await axios.post(
-      API_URL + "games",
-      rawQueryString,
-      config,
-    );
-    console.log(response.data[0].name);
-    console.log(response.data[0].artworks);
-
+    const videogameData = await searchVideogame(name);
     //Search Videogame Name
-    const videogameName = response.data[0].name;
-    const artworkID = response.data[0].artworks;
-
-    let rawArtworkQueryString = `fields image_id ;where id = ${artworkID};`;
-
-    //Search Artwork
-    const response_artwork = await axios.post(
-      API_URL + "artworks",
-      rawArtworkQueryString,
-      config,
-    );
-
-    console.log(response_artwork.data);
-
-    const imageID = response_artwork.data[0].image_id;
-    const imageURL = `https://images.igdb.com/igdb/image/upload/t_cover_big/${imageID}.jpg`;
-    console.log(imageURL);
-
+    const videogameName = videogameData[0];
+    console.log(videogameName);
+    //Search artwork
+    const artworkID = videogameData[1];
+    const imageURL = await searchArtwork(artworkID);
     const gameReview = {
       name: videogameName,
       imgURL: imageURL,
@@ -94,3 +62,31 @@ app.post("/review", async (req, res) => {
     res.redirect("/");
   }
 });
+
+
+async function searchVideogame(name){
+let rawQueryString = `fields name, artworks ;search "${name}" ;where version_parent = null;`;
+    const response = await axios.post(
+      API_URL + "games",
+      rawQueryString,
+      config,
+    );
+    return [response.data[0].name, response.data[0].artworks]
+}
+
+async function searchArtwork(artworkID) {
+  let rawArtworkQueryString = `fields image_id ;where id = ${artworkID};`;
+
+    //Search Artwork
+    const response_artwork = await axios.post(
+      API_URL + "artworks",
+      rawArtworkQueryString,
+      config,
+    );
+
+    console.log(response_artwork.data);
+
+    const imageID = response_artwork.data[0].image_id;
+    return  `https://images.igdb.com/igdb/image/upload/t_cover_big/${imageID}.jpg`;
+
+}

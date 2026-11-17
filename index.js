@@ -10,7 +10,7 @@ const API_URL = "https://api.igdb.com/v4/";
 const config = {
   headers: { "Client-ID": ClientID, Authorization: bearerToken },
 };
-
+var possibleTitles = [];
 //const rawQueryString = 'fields name;search "Halo";where version_parent = null; limit  1;';
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -27,6 +27,8 @@ app.get("/", (req, res) => {
   }
 });
 
+
+
 app.get("/review", (req, res) => {
   try {
     res.render("review.ejs");
@@ -34,6 +36,15 @@ app.get("/review", (req, res) => {
     console.log("Error: " + err);
   }
 });
+
+//Title search for datalist
+app.post("/search-game", async (req,res)=>{
+  const name = req.body.name;
+  console.log(name);
+  const videogameData = await searchVideogameTitle(name);
+  console.log("RESULTADO:"  +  videogameData);
+  res.json(videogameData);
+})
 
 app.post("/review", async (req, res) => {
   const name = req.body.videogameSearched;
@@ -62,7 +73,18 @@ app.post("/review", async (req, res) => {
     res.redirect("/");
   }
 });
+async function searchVideogameTitle(name){
+let rawQueryString = `fields name ;search "${name}" ;where version_parent = null; limit 4;`;
+    const response = await axios.post(
+      API_URL + "games",
+      rawQueryString,
+      config,
+    );
+    possibleTitles = response.data.map(element => element.name);
 
+    console.log(possibleTitles);
+    return possibleTitles
+}
 
 async function searchVideogame(name){
 let rawQueryString = `fields name, artworks ;search "${name}" ;where version_parent = null;`;
@@ -73,6 +95,8 @@ let rawQueryString = `fields name, artworks ;search "${name}" ;where version_par
     );
     return [response.data[0].name, response.data[0].artworks]
 }
+
+
 
 async function searchArtwork(artworkID) {
   let rawArtworkQueryString = `fields image_id ;where id = ${artworkID};`;

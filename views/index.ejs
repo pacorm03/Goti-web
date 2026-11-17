@@ -6,9 +6,31 @@
   <div class="form-adorn-icon" aria-hidden="true">
     <svg class="bi" width="16" height="16"><use href="#search" /></svg>
   </div>
-  <input type="search" name="videogameSearched" class="form-ghost" placeholder="Search...">
+  <input type="search" id="videogameInputSearch" list="datalistOptions" name="videogameSearched" class="form-ghost" placeholder="Search...">
+  <datalist id="datalistOptions">
+  <% if(locals.videogameList){ %>
+    
+    <% console.log("transmitiendo"); %>
+    <%videogameList.forEach(element => { %>
+      <option value="<%= element  %>"></option>
+          <% console.log(element); %>
+
+    <% }); %>
+  <option value="San Francisco">
+  <option value="New York">
+  <option value="Seattle">
+  <option value="Los Angeles">
+  <option value="Chicago">
+ 
+
+  <% } %>
+   </datalist>
 </label>
 </form>
+
+
+<h1></h1>
+
 
 <p class="videogameError">Videogame doesnt exist</p>
 

@@ -11,6 +11,8 @@ const config = {
   headers: { "Client-ID": ClientID, Authorization: bearerToken },
 };
 var possibleTitles = [];
+var possibleId = [];
+var videogameIndex = 0;
 //const rawQueryString = 'fields name;search "Halo";where version_parent = null; limit  1;';
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -47,11 +49,21 @@ app.post("/search-game", async (req,res)=>{
 })
 
 app.post("/review", async (req, res) => {
-  const name = req.body.videogameSearched;
-  console.log(name);
-  
+  //const name = req.body.videogameSearched;
+  let name = "";
+  if(possibleTitles.length > 1){
+     name =  searchShortestTitle(possibleTitles);
+    console.log("Shortest:" + name);
+
+  }else{
+     name = req.body.videogameSearched;
+      console.log(name);
+  }
+
+
   try {
-    const videogameData = await searchVideogame(name);
+    console.log(possibleId[videogameIndex]);
+    const videogameData = await searchVideogame(possibleId[videogameIndex]);
     //Search Videogame Name
     const videogameName = videogameData[0];
     console.log(videogameName);
@@ -73,44 +85,66 @@ app.post("/review", async (req, res) => {
     res.redirect("/");
   }
 });
+
+function searchShortestTitle(titleArray){
+  let shortTitle = "";
+  let actualTitle = "";
+  let actualIndex = 0;
+  titleArray.forEach(element => {
+    if(element === titleArray[0]){
+      shortTitle = element;
+      actualTitle = element;
+      actualIndex = 0;
+    }else{
+      actualIndex++;
+      actualTitle = element;
+      if(actualTitle.length < shortTitle.length){
+        videogameIndex = actualIndex;
+        shortTitle = actualTitle;
+      }
+    }
+    console.log("Short title: " + shortTitle + " " + shortTitle.length);
+  });
+  return shortTitle;
+}
 async function searchVideogameTitle(name){
-let rawQueryString = `fields name ;search "${name}" ;where version_parent = null; limit 4;`;
+let rawQueryString = `fields name, id;search "${name}" ;where version_parent = null; limit 4;`;
     const response = await axios.post(
       API_URL + "games",
       rawQueryString,
       config,
     );
     possibleTitles = response.data.map(element => element.name);
-
+    possibleId = response.data.map(element => element.id);
     console.log(possibleTitles);
+    console.log(possibleId);
     return possibleTitles
 }
 
-async function searchVideogame(name){
-let rawQueryString = `fields name, artworks ;search "${name}" ;where version_parent = null;`;
+async function searchVideogame(id){
+    let rawQueryString = `fields name, cover ;where id = ${id};`;
+
     const response = await axios.post(
       API_URL + "games",
       rawQueryString,
       config,
     );
-    return [response.data[0].name, response.data[0].artworks]
+
+    console.log(response.data[0]);
+
+    return [response.data[0].name, response.data[0].cover];
 }
 
+async function searchArtwork(coverID) {
+    let rawCoverQueryString = `fields image_id ;where id = ${coverID};`;
 
-
-async function searchArtwork(artworkID) {
-  let rawArtworkQueryString = `fields image_id ;where id = ${artworkID};`;
-
-    //Search Artwork
-    const response_artwork = await axios.post(
-      API_URL + "artworks",
-      rawArtworkQueryString,
+    const response_cover = await axios.post(
+      API_URL + "covers",
+      rawCoverQueryString,
       config,
     );
 
-    console.log(response_artwork.data);
+    const imageID = response_cover.data[0].image_id;
 
-    const imageID = response_artwork.data[0].image_id;
-    return  `https://images.igdb.com/igdb/image/upload/t_cover_big/${imageID}.jpg`;
-
+    return `https://images.igdb.com/igdb/image/upload/t_cover_big/${imageID}.jpg`;
 }

@@ -1,12 +1,13 @@
 var searchTitle = "";
 
-$("#videogameInputSearch").on("keypress",(event) =>{
-    sendInputSearch(event.key);
+$("#videogameInputSearch").on("input",(event) =>{
+    let inputText = $("#videogameInputSearch").val();
+    sendInputSearch(inputText);
 });
 
 function sendInputSearch(key){
-    searchTitle += key;
-    console.log(searchTitle);
+    searchTitle = key;
+    console.log("Input text: " + searchTitle);
     //client to server request 
     $.ajax({
     url: "/search-game",

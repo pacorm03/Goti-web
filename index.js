@@ -42,7 +42,7 @@ app.post("/search-game", async (req,res)=>{
   const name = req.body.name;
   console.log(name);
   const videogameData = await searchVideogameTitle(name);
-  console.log("RESULTADO:"  +  videogameData);
+  console.log("RESULTADO: "  +  videogameData);
   res.json(videogameData);
 })
 

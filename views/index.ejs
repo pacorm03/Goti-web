@@ -16,24 +16,15 @@
           <% console.log(element); %>
 
     <% }); %>
-  <option value="San Francisco">
-  <option value="New York">
-  <option value="Seattle">
-  <option value="Los Angeles">
-  <option value="Chicago">
- 
-
   <% } %>
    </datalist>
 </label>
 </form>
+  <% if(locals.noExists){ %>
 
+<p> NO EXISTS</p>
 
-<h1></h1>
-
-
-<p class="videogameError">Videogame doesnt exist</p>
-
+  <% } %>
 
 
 <%-  include("./partials/footer.ejs") %>

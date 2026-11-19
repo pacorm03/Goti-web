@@ -24,11 +24,20 @@ function sendInputSearch(key) {
   });
   return searchTitle; //string
 }
+$("#videogameInputSearch").on("change", function() {
 
-$("#datalistOptions").on("click", (event) => {
-  $.ajax({
-    url: "/review",
-    method: "POST",
-    data: { videogameSearched: $(this).val() },
-  });
+    console.log($(this).val());
+
+    $.ajax({
+        url: "/review",
+        method: "POST",
+        data: {
+            videogameSearched: $(this).val()
+        },
+        success: function () {
+            
+      console.log("Click accepted");
+    },
+    });
+
 });
